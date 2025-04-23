@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Battleship Game</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚢</text></svg>">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f4f8;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      gap: 50px;
+      margin-top: 20px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, 30px);
+      grid-template-rows: repeat(8, 30px);
+      gap: 2px;
+      background-color: #444;
+      padding: 5px;
+      border-radius: 10px;
+    }
+    .cell {
+      width: 30px;
+      height: 30px;
+      background-color: #cce7ff;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .cell.ship {
+      background-color: #555;
+    }
+    .cell.hit {
+      background-color: red;
+      animation: hitAnim 0.5s ease;
+    }
+    .cell.miss {
+      background-color: white;
+    }
+    /* Hit animation keyframes */
+    @keyframes hitAnim {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    .scoreboard {
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #restart-button {
+      display: none;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Battleship</h1>
+  <p id="instructions">Click on your board to place your ships. Toggle direction if needed.</p>
+  <button id="toggle-direction">Direction: Horizontal</button>
+
+  <div class="container">
+    <div>
+      <h3>Your Board</h3>
+      <div id="player-board" class="board"></div>
+    </div>
+    <div>
+      <h3>Computer Board</h3>
+      <div id="computer-board" class="board"></div>
+    </div>
+  </div>
+
+  <button id="start-button">Start Game</button>
+  <button id="restart-button">Play Again</button>
+
+  <div class="scoreboard">
+    <p><strong>Your Score:</strong> <span id="player-score">0</span></p>
+    <p><strong>Computer Score:</strong> <span id="computer-score">0</span></p>
+  </div>
+
+  <script>
+    const playerBoard = document.getElementById("player-board");
+    const computerBoard = document.getElementById("computer-board");
+    const startButton = document.getElementById("start-button");
+    const restartButton = document.getElementById("restart-button");
+    const toggleDirectionBtn = document.getElementById("toggle-direction");
+    const instructions = document.getElementById("instructions");
+    const playerScoreEl = document.getElementById("player-score");
+    const computerScoreEl = document.getElementById("computer-score");
+
+    let playerCells = [];
+    let computerCells = [];
+
+    let playerShips = [];
+    let computerShips = [];
+    let gameStarted = false;
+    let placingShips = true;
+    let playerTurn = true;
+    let playerScore = 0;
+    let computerScore = 0;
+
+    const gridSize = 8;
+    const totalCells = gridSize * gridSize;
+    const shipSizes = [4, 3, 2, 2]; // Ships of varying lengths
+    let shipIndex = 0;
+    let isHorizontal = true;
+
+    function createBoard(board, cells, isPlayer) {
+      for (let i = 0; i < totalCells; i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
+        board.appendChild(cell);
+        cells.push(cell);
+
+        if (isPlayer && placingShips) {
+          cell.addEventListener("click", () => placeShip(i));
+        }
+      }
+    }
+
+    function placeShip(startIndex) {
+      if (shipIndex >= shipSizes.length) return;
+
+      const size = shipSizes[shipIndex];
+      const indices = [];
+
+      for (let i = 0; i < size; i++) {
+        const offset = isHorizontal ? i : i * gridSize;
+        const index = startIndex + offset;
+
+        const rowStart = Math.floor(startIndex / gridSize);
+        const rowEnd = Math.floor(index / gridSize);
+
+        if (index >= totalCells) return;
+        if (isHorizontal && rowStart !== rowEnd) return;
+        if (!isHorizontal && index % gridSize !== startIndex % gridSize) return;
+        if (playerShips.includes(index)) return;
+
+        indices.push(index);
+      }
+
+      // Mark the ship on player's board
+      indices.forEach(i => {
+        playerCells[i].classList.add("ship");
+        playerShips.push(i);
+      });
+
+      shipIndex++;
+      if (shipIndex === shipSizes.length) {
+        instructions.textContent = "All ships placed! Click Start Game.";
+      } else {
+        instructions.textContent = `Place ship of length ${shipSizes[shipIndex]}`;
+      }
+    }
+
+    function toggleDirection() {
+      isHorizontal = !isHorizontal;
+      toggleDirectionBtn.textContent = `Direction: ${isHorizontal ? "Horizontal" : "Vertical"}`;
+    }
+
+    function placeComputerShips() {
+      shipSizes.forEach(size => {
+        let placed = false;
+        while (!placed) {
+          const isH = Math.random() < 0.5;
+          const start = Math.floor(Math.random() * totalCells);
+          const indices = [];
+
+          for (let i = 0; i < size; i++) {
+            const offset = isH ? i : i * gridSize;
+            const index = start + offset;
+            const rowStart = Math.floor(start / gridSize);
+            const rowEnd = Math.floor(index / gridSize);
+
+            if (index >= totalCells) break;
+            if (isH && rowStart !== rowEnd) break;
+            if (!isH && index % gridSize !== start % gridSize) break;
+            if (computerShips.includes(index)) break;
+
+            indices.push(index);
+          }
+
+          if (indices.length === size) {
+            indices.forEach(i => computerShips.push(i));
+            placed = true;
+          }
+        }
+      });
+    }
+
+    function startGame() {
+      const totalShipCells = shipSizes.reduce((a, b) => a + b, 0);
+      if (playerShips.length !== totalShipCells) {
+        alert("Place all ships first!");
+        return;
+      }
+
+      placingShips = false;
+      gameStarted = true;
+      startButton.disabled = true;
+      playerBoard.classList.add("disabled");
+      instructions.textContent = "Click on the computer board to attack!";
+
+      computerCells.forEach((cell, index) => {
+        cell.addEventListener("click", () => {
+          if (!gameStarted || !playerTurn || cell.classList.contains("hit") || cell.classList.contains("miss")) return;
+
+          if (computerShips.includes(index)) {
+            cell.classList.add("hit");
+            playerScore++;
+            playerScoreEl.textContent = playerScore;
+          } else {
+            cell.classList.add("miss");
+          }
+
+          playerTurn = false;
+          checkWin();
+          setTimeout(computerMove, 700);
+        });
+      });
+    }
+
+    function computerMove() {
+      let index;
+      do {
+        index = Math.floor(Math.random() * totalCells);
+      } while (
+        playerCells[index].classList.contains("hit") ||
+        playerCells[index].classList.contains("miss")
+      );
+
+      if (playerShips.includes(index)) {
+        playerCells[index].classList.add("hit");
+        computerScore++;
+        computerScoreEl.textContent = computerScore;
+      } else {
+        playerCells[index].classList.add("miss");
+      }
+
+      playerTurn = true;
+      checkWin();
+    }
+
+    function checkWin() {
+      const totalShipCells = shipSizes.reduce((a, b) => a + b, 0);
+      if (playerScore === totalShipCells) {
+        alert("🎉 You win!");
+        endGame();
+      } else if (computerScore === totalShipCells) {
+        alert("💥 Computer wins!");
+        endGame();
+      }
+    }
+
+    function endGame() {
+      gameStarted = false;
+      restartButton.style.display = "inline-block";
+      instructions.textContent = "Game Over. Play again?";
+    }
+
+    function resetGame() {
+      playerBoard.innerHTML = "";
+      computerBoard.innerHTML = "";
+      playerCells = [];
+      computerCells = [];
+      playerShips = [];
+      computerShips = [];
+      playerScore = 0;
+      computerScore = 0;
+      gameStarted = false;
+      placingShips = true;
+      playerTurn = true;
+      shipIndex = 0;
+      isHorizontal = true;
+      startButton.disabled = false;
+      restartButton.style.display = "none";
+      instructions.textContent = "Click on your board to place your ships. Toggle direction if needed.";
+      playerScoreEl.textContent = "0";
+      computerScoreEl.textContent = "0";
+      toggleDirectionBtn.textContent = "Direction: Horizontal";
+
+      createBoard(playerBoard, playerCells, true);
+      createBoard(computerBoard, computerCells, false);
+      placeComputerShips();
+    }
+
+    toggleDirectionBtn.addEventListener("click", toggleDirection);
+    startButton.addEventListener("click", startGame);
+    restartButton.addEventListener("click", resetGame);
+
+    // Initialize first game
+    createBoard(playerBoard, playerCells, true);
+    createBoard(computerBoard, computerCells, false);
+    placeComputerShips();
+  </script>
+</body>
+</html>

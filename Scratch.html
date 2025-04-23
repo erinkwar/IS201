@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<!-- This is my scratch page. I'll link my scratch.css page -->
+<link rel="stylesheet" href="css/scratch.css">
+<body id="page-top">
+
+    <!-- This is my scratch page -->
+     <h1>My Scratch Page</h1>
+     <!-- these are my nav links. I'll want to reposition and style them later -->
+    <nav>
+        <ul class="navbar">
+            <li><a href="index.html">Home Page</a></li>
+            <li><a href="#my-favorite-flowers">Favorite Flowers</a></li>
+            <li><a href="webapp.html">Web App: Battleship</a></li>
+        </ul>
+    </nav>
+    <!-- video that will walk you through how to insert a tableau graph --> 
+<!--ordered list/unordered list-->
+<div class ="content-block" id="block1">
+    <h2>My Favorite Things</h2>
+    <ol>
+        <li>I love the outdoors</li>
+        <li>I also love flowers</li>
+        <li id="my-favorite-flowers">My favorite Flowers are:
+            <ul>
+                <li>Tulips </li>
+                <li>Lilies</li>
+                <li>Peonies</li>
+                <li>Poppies</li>
+            </ul>
+        </li>
+        <li>I love to dance</li>
+        <li>My celebrity crush is Tom Holland</li>
+    </ol>
+</div>
+    <br>
+    <div class="content-block" id="block2">
+        <h2>Favorite Pictures</h2>
+        <img src="assets/img/skiingsarah.jpeg" alt="Skiing Picture" height="400">
+        <br><br><br><br><br>
+        <img src="assets/img/flowers.jpeg" alt="Floweres Picture" height="400">
+        <br><br><br><br><br>
+        <img src="assets/img/dance.JPG" alt="Dance Picture" height="400">
+        <br><br><br><br><br>
+    </div>
+<!--Embedded youtube video-->
+<div class="content-block" id="block3">
+    <h2>Favorite Video</h2>
+    <iframe width="560" height="315" src="https://www.youtube.com/watch?v=Brq-exSvB7Q" title="Tom Holland Umbrella Performance" 
+    frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+    </iframe>
+    <br><br><br>
+</div>
+<h2>This is my awesome tableau</h2>
+<div class='tableauPlaceholder' id='viz1745362993246' style='position: relative'><noscript>
+    <a href='#'><img alt='Population and Birth Rate (2012) ' 
+        src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Wo&#47;WorldIndicators_17453628302720&#47;Population&#47;1_rss.png' 
+        style='border: none' /></a></noscript><object 
+    class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3'
+     /> <param name='site_root' value='' /><param name='name' value='WorldIndicators_17453628302720&#47;Population' 
+     /><param name='tabs' value='no' /><param name='toolbar' value='yes' 
+     /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Wo&#47;WorldIndicators_17453628302720&#47;Population&#47;1.png' 
+     /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' 
+     /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' 
+     /><param name='language' value='en-US' /><param name='filter' value='publish=yes' /></object>
+    </div>               
+     <script type='text/javascript'>                    
+     var divElement = document.getElementById('viz1745362993246');                   
+      var vizElement = divElement.getElementsByTagName('object')[0];                   
+       vizElement.style.width='100%';vizElement.style.height=(divElement.offsetWidth*0.75)+'px';                   
+        var scriptElement = document.createElement('script');                    
+        scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    
+        vizElement.parentNode.insertBefore(scriptElement, vizElement);               
+         </script>
+  <a href="#page-top">Return to Top</a>
+</body>
+</html>
